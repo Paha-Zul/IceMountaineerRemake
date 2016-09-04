@@ -243,3 +243,30 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Assets/Resources/materials
+/Assets/Prefabs/regular
+/Assets/Plugins
+/Assets/PlayServicesResolver/Editor
+/Assets/materials
+/Assets/GooglePlayGames
+/Assets/GoogleMobileAds
+/Assets/Fonts
+/Assets/Editor
+/Assets/Data
+/Assets/Art
+/Assets/AppodealDemo
+/Assets/Appodeal
+/Temp
+/ProjectSettings
+/Library
+/Such.unitypackage
+/IceMountaineerRemake.sln
+/IceMountaineerRemake.CSharp.Plugins.csproj
+/IceMountaineerRemake.CSharp.Editor.csproj
+/IceMountaineerRemake.CSharp.csproj
+/IceMountaineer.apk
+/Assets/Sounds
+/Assets/RopeMat.mat
+/Assets/GDGSids.cs
+/Assets/CloudMaterial.mat
+/Assets/bouncy.physicsMaterial2D
