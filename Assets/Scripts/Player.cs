@@ -8,6 +8,7 @@ public class Player : MonoBehaviour {
     public GameObject birdShield;
     public ParticleSystem emitter;
     public GameLevel gameLevelScript;
+    public GameObject ropePrefab2;
     public float ropeLength, ropeSpeed, hookSpeed;
 
     private bool aTap;
@@ -17,14 +18,25 @@ public class Player : MonoBehaviour {
     private Hook connectedHook;
     private GameObject rope;
     private MeshRenderer ropeRenderer;
+    private Rigidbody2D rigidBody;
+
+    private GameObject currRope;
+    private Rope currRopeSegment;
+    private Rope nextRopeSegment;
+    private float ropeTransitionCounter;
 
 	// Use this for initialization
 	void Start () {
+        //Ingore
+        Physics2D.IgnoreLayerCollision(8, 9);
+
         this.joint = GetComponent<DistanceJoint2D>();
         this.rope = Instantiate(this.ropePrefab);
         this.ropeRenderer = this.rope.transform.GetChild(0).GetComponent<MeshRenderer>();
         this.emitter = GameObject.Find("ImpactParticles").GetComponent<ParticleSystem>();
         this.levelScript = Camera.main.GetComponent<GameLevel>();
+
+        this.rigidBody = GetComponent<Rigidbody2D>();
 
         this.calculateBonuses();
     }
@@ -34,9 +46,9 @@ public class Player : MonoBehaviour {
     /// </summary>
     void calculateBonuses()
     {
-        this.ropeSpeed = Constants.RopeSpeed + PlayerPrefs.GetInt("RopeSpeed") * Constants.RopeSpeedIncrease;
-        this.ropeLength = Constants.RopeLength + PlayerPrefs.GetInt("RopeLength") * Constants.RopeLengthDecrease;
-        this.hookSpeed = Constants.HookSpeed + PlayerPrefs.GetInt("HookSpeed") * Constants.HookSpeedIncrease;
+        this.ropeSpeed = Constants.RopeSpeed + PlayerPrefs.GetInt("RopeSpeed") * UpgradeManager.getUpgrade("ropespeed").amtChange;
+        this.ropeLength = Constants.RopeLength + PlayerPrefs.GetInt("RopeLength") * UpgradeManager.getUpgrade("ropelength").amtChange;
+        this.hookSpeed = Constants.HookSpeed + PlayerPrefs.GetInt("HookSpeed") * UpgradeManager.getUpgrade("hookspeed").amtChange;
 
         if (PlayerPrefs.GetInt("HardHat") == 0) this.hardHat.SetActive(false);
         if (PlayerPrefs.GetInt("BirdShield") == 0) this.birdShield.SetActive(false);
@@ -44,7 +56,7 @@ public class Player : MonoBehaviour {
         BoxCollider2D collider = this.GetComponent<BoxCollider2D>();
 
         UpgradeManager.Upgrade up = UpgradeManager.getUpgrade("bounciness");
-        collider.sharedMaterial.bounciness = Constants.Bounciness + up.curr * Constants.BouncinessDecrease;
+        collider.sharedMaterial.bounciness = Constants.Bounciness + up.curr * UpgradeManager.getUpgrade("bounciness").amtChange;
 
         //Apparently you need to toggle this for the material to change.
         collider.enabled = false;
@@ -115,51 +127,88 @@ public class Player : MonoBehaviour {
         }
     }
 
-    //Connects to a hook.
+    //Called when we should connect to the hook
     public void ConnectToHook(Hook hook)
     {
         //If the joint was destroyed, that means we are falling.
         if (this.joint != null)
         {
+            this.transform.parent = null;
+            if (currRope)
+                Destroy(currRope);
+
+            var masterRope = (Instantiate(ropePrefab2, new Vector3(hook.transform.position.x, hook.transform.position.y, hook.transform.position.z), Quaternion.identity) as GameObject).GetComponent<MasterRope>();
             this.connectedHook = hook;
             this.distToHook = Vector3.Distance(this.transform.position, hook.transform.position);
-            this.joint.distance = this.distToHook;
-            this.joint.connectedBody = hook.GetComponent<Rigidbody2D>();
+
+            var angleRadians = Mathf.Atan2(transform.position.y - hook.transform.position.y, transform.position.x - hook.transform.position.x);
+
+            masterRope.SetAnchor(hook.gameObject);
+
+            currRope = masterRope.gameObject;
+            //currRope.transform.parent = hook.transform;
+            masterRope.GetComponent<HingeJoint2D>().connectedBody = hook.GetComponent<Rigidbody2D>();
+
+            //Set the angle and number of segments
+            masterRope.angle = angleRadians*Mathf.Rad2Deg;
+            masterRope.segments = (int)(distToHook / masterRope.segmentLength) + 1;
+
+            //Init the rope, get the last rope, and add the player to the end of the rope.
+            var ropes = masterRope.Init();
+            masterRope.addAtEndOfRope(this.gameObject, ropes[ropes.Length-1]);
+
+            currRopeSegment = ropes[ropes.Length - 1].GetComponent<Rope>();
+            nextRopeSegment = currRopeSegment.transform.parent.GetComponent<Rope>();
+
+            var x = Mathf.Cos(angleRadians) * distToHook;
+            var y = Mathf.Sin(angleRadians) * distToHook;
+
+            //this.joint.distance = this.distToHook;
+            //this.joint.connectedBody = hook.GetComponent<Rigidbody2D>();
         }
     }
 
     //Reels in the hook.
     void ReelInHook()
     {
-        if (this.joint.distance > this.ropeLength)
-        {
-            this.joint.distance -= this.ropeSpeed;
-            if (this.joint.distance <= this.ropeLength) this.joint.distance = this.ropeLength;
+        var dst = Vector3.Distance(this.transform.position, currRope.transform.position);
+        if(currRopeSegment && nextRopeSegment && dst > this.ropeLength) {
+            this.ropeTransitionCounter += ropeSpeed;
+
+            if(this.ropeTransitionCounter >= 1) {
+                this.ropeTransitionCounter = 0;
+
+                //Unhook the connected body.
+                this.currRopeSegment.hingeJoint.connectedBody = null;
+
+                //Save this to destroy later
+                var destroying = currRopeSegment.gameObject;
+
+                //Set the new curr and next rope segments
+                this.currRopeSegment = this.nextRopeSegment;
+                this.nextRopeSegment = this.currRopeSegment.transform.parent.GetComponent<Rope>();
+
+                //Hook to the new rope segment
+                this.currRopeSegment.hingeJoint.connectedBody = this.rigidBody;
+                this.currRopeSegment.transform.GetChild(0).GetComponent<SpriteRenderer>().enabled = false;
+
+                //Parent us to the new rope segment.
+                this.transform.parent = this.nextRopeSegment.transform;
+
+                //Destroy the old rope segment.
+                Destroy(destroying);
+            }else {
+                this.transform.position = Vector3.Lerp(currRopeSegment.transform.position, nextRopeSegment.transform.position, ropeTransitionCounter);
+            }
         }
     }
 
     void DrawRope(){
-        GameObject r = this.rope;
-        Vector2 connAnchor = this.joint.connectedBody == null ? this.joint.connectedAnchor : this.joint.connectedBody.position;
-        float disToHook = this.joint.distance; //Initially set as joint distance
-        if(this.joint.connectedBody != null) //If the connect body is not null, get the distance to that.
-            disToHook = Vector3.Distance(this.joint.connectedBody.transform.position, this.transform.position);
-
-        //Set the position, the scale (to the wall), and the angle of the rope.
-        r.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
-        r.transform.localScale = new Vector3(r.transform.localScale.x, disToHook, r.transform.localScale.z);
-
-        float angle = Mathf.Atan2(connAnchor.y - r.transform.position.y, connAnchor.x - r.transform.position.x); //Angle to mouse
-        r.transform.rotation = Quaternion.Euler(0, 0, angle*Mathf.Rad2Deg - 90);
-
-        //Here we set the material tile scaling to match the rope length.
-        Vector2 scale = ropeRenderer.material.mainTextureScale;
-        scale.y = r.transform.localScale.y;
-        ropeRenderer.material.mainTextureScale = scale;
+        
     }
 
     public bool isFalling(){
-        return this.joint == null;
+        return this.transform.parent == null;
     }
 
     void OnTriggerEnter2D(Collider2D coll){
@@ -180,6 +229,8 @@ public class Player : MonoBehaviour {
             } else {
                 //Otherwise, kill us!
                 DistanceJoint2D joint = this.GetComponent<DistanceJoint2D>();
+                currRopeSegment.hingeJoint.connectedBody = null;
+                this.transform.parent = null;
                 Destroy(joint);
                 this.connectedHook = null;
             }
@@ -189,6 +240,6 @@ public class Player : MonoBehaviour {
     void OnBecameInvisible()
     {
         levelScript.GameOver();
-        Destroy(this.gameObject);
+        //Destroy(this.gameObject);
     }
 }

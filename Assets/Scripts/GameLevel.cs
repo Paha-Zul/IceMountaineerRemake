@@ -16,6 +16,8 @@ public class GameLevel : MonoBehaviour {
     public GameObject player;
     public float wallHeight;
 
+    private GameObject wallCategory;
+
     public static LevelType levelType;
     public static bool paused { get; private set; }
 
@@ -37,6 +39,8 @@ public class GameLevel : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        this.wallCategory = GameObject.Find("Walls");
+
         configureArtStyle();
 
         //Initially set the time scale to 0...
@@ -70,6 +74,9 @@ public class GameLevel : MonoBehaviour {
 
             walls.Add(wallLeft);
             walls.Add(wallRight);
+
+            wallLeft.wall.transform.parent = wallCategory.transform;
+            wallRight.wall.transform.parent = wallCategory.transform;
 
             //If the wall below left and right aren't null, set the new walls to above them.
             if (wallBelowLeft != null)
@@ -126,6 +133,9 @@ public class GameLevel : MonoBehaviour {
 
             walls.Add(wallLeft);
             walls.Add(wallRight);
+
+            wallLeft.wall.transform.parent = wallCategory.transform;
+            wallRight.wall.transform.parent = wallCategory.transform;
 
             //If the wall below left and right aren't null, set the new walls to above them.
             if (wallBelowLeft != null)

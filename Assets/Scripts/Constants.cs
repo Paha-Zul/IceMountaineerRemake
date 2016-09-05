@@ -11,9 +11,8 @@ public class Constants  {
     public const string HookSpeedPrefString = "HookSpeed";
 
     public const float RopeLength = 4f;
-    public const float RopeSpeed = 0.05f;
+    public const float RopeSpeed = 0.1f;
     public const float Bounciness = 0.3f;
-    public const float RopeLengthDecrease = -0.1f, RopeSpeedIncrease = 0.05f, BouncinessDecrease = -0.01f, HookSpeedIncrease = 0.01f;
     public const float WallSpeed = 0.01f, WallSpeedIncrease = 0.0025f, WallSpeedIncreaseDodgedInterval = 5;
     public const float HookSpeed = 0.2f;
 
@@ -25,10 +24,6 @@ public class Constants  {
     public const float InitialBirdSpawnSpeed = 5;
     public const float NumShardsPerBirdSpawnIncrease = 5;
     public const float BirdSpawnIncreaseSpeed = 0.2f;
-
-    public const int RopeSpeedCost = 10, RopeLengthCost = 10, BouncinessCost = 10, HookSpeedCost = 10, HardHatCost = 50;
-    public const int RopeSpeedCostIncr = 1, RopeLengthCostIncr = 1, BouncinessCostIncr = 1, HookSpeedCostIncr = 1, HardHatCostIncr = 10;
-    public const int maxRopeSpeedUpgrades = 10, MaxRopeLengthUpgrades = 20, maxBouncinessUpgrade = 10, maxHookSpeedUpgrade = 10, maxHardHatUpgrade = 1;
 
     public const int ScoreThresholdCoinBonus = 15;
     public const float ScoreCoinBonusMultiplier = 1.5f;

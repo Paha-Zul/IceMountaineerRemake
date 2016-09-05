@@ -6,8 +6,8 @@ using System.Collections.Generic;
 public class UpgradeManager : MonoBehaviour {
     public MainMenu mainMenuScript;
 
-    public Text currSpeed, currLength, currBounciness, currHardHat, currHookSpeed, currBirdShield;
-    public Text costSpeed, costLength, costBounciness, costHardHat, costHookSpeed, costBirdShield;
+    public Text currSpeedText, currLengthText, currBouncinessText, currHardHatText, currHookSpeedText, currBirdShieldText;
+    public Text costSpeedText, costLengthText, costBouncinessText, costHardHatText, costHookSpeedText, costBirdShieldText;
 
     private static Dictionary<string, Upgrade> upgradeMap = new Dictionary<string, Upgrade>();
     public static bool populated { get; set; }
@@ -26,32 +26,46 @@ public class UpgradeManager : MonoBehaviour {
         int currHookSpeed = PlayerPrefs.GetInt("HookSpeed");
         //int coins = PlayerPrefs.GetInt(Defaults.CoinPrefString);
 
-        refreshOrAdd("ropespeed", "RopeSpeed", 10, 1, Constants.maxRopeSpeedUpgrades, currRopeSpeed, costSpeed, currSpeed);
-        refreshOrAdd("ropelength", "RopeLength", 10, 1, Constants.MaxRopeLengthUpgrades, currRopeLength, costLength, currLength);
-        refreshOrAdd("bounciness", "Bounciness", 10, 1, Constants.maxBouncinessUpgrade, currBounciness, this.costBounciness, this.currBounciness);
-        refreshOrAdd("hookspeed", "HookSpeed", 10, 1, Constants.maxHookSpeedUpgrade, currHookSpeed, this.costHookSpeed, this.currHookSpeed);
-        refreshOrAdd("hardhat", "HardHat", 50, 0, 1, currHardHat, this.costHardHat, this.currHardHat);
-        refreshOrAdd("birdshield", "BirdShield", 50, 0, 1, currHardHat, this.costBirdShield, this.currBirdShield);
+        this.currSpeedText = GameObject.Find("CostSpeed").GetComponent<Text>();
+        this.currLengthText = GameObject.Find("CostLength").GetComponent<Text>();
+        this.currBouncinessText = GameObject.Find("CostBounciness").GetComponent<Text>();
+        this.currHardHatText = GameObject.Find("CostHardHat").GetComponent<Text>();
+        this.currHookSpeedText = GameObject.Find("CostHookSpeed").GetComponent<Text>();
+        this.currBirdShieldText = GameObject.Find("CostBirdShield").GetComponent<Text>();
+
+        this.costSpeedText = GameObject.Find("CurrSpeed").GetComponent<Text>();
+        this.costLengthText = GameObject.Find("CurrLength").GetComponent<Text>();
+        this.costBouncinessText = GameObject.Find("CurrBounciness").GetComponent<Text>();
+        this.costHardHatText = GameObject.Find("CurrHardHat").GetComponent<Text>();
+        this.costHookSpeedText = GameObject.Find("CurrHookSpeed").GetComponent<Text>();
+        this.costBirdShieldText = GameObject.Find("CurrBirdShield").GetComponent<Text>();
+
+        RefreshOrAddUpgrade("ropespeed", "RopeSpeed", 15, 1, 5, currRopeSpeed, 0.05f, costSpeedText, currSpeedText);
+        RefreshOrAddUpgrade("ropelength", "RopeLength", 15, 1, 5, currRopeLength, -0.5f, costLengthText, currLengthText);
+        RefreshOrAddUpgrade("bounciness", "Bounciness", 15, 1, 5, currBounciness, -0.01f, this.costBouncinessText, this.currBouncinessText);
+        RefreshOrAddUpgrade("hookspeed", "HookSpeed", 15, 1, 5, currHookSpeed, 0.01f, this.costHookSpeedText, this.currHookSpeedText);
+        RefreshOrAddUpgrade("hardhat", "HardHat", 50, 0, 1, currHardHat, 0, this.costHardHatText, this.currHardHatText);
+        RefreshOrAddUpgrade("birdshield", "BirdShield", 50, 0, 1, currHardHat, 0, this.costBirdShieldText, this.currBirdShieldText);
     }
 
     /// <summary>
     /// Validates the preferences. Maybe a temporary thing?
     /// </summary>
     private void validatePrefLimits() {
-        int ropeLengthUps = PlayerPrefs.GetInt(Constants.RopeLengthPrefString);
-        int ropeSpeedUps = PlayerPrefs.GetInt(Constants.RopeSpeedPrefString);
-        int bouncinessUps = PlayerPrefs.GetInt(Constants.BouncinessPrefString);
-        int hookSpeedUps = PlayerPrefs.GetInt(Constants.HookSpeedPrefString);
+        //int ropeLengthUps = PlayerPrefs.GetInt(Constants.RopeLengthPrefString);
+        //int ropeSpeedUps = PlayerPrefs.GetInt(Constants.RopeSpeedPrefString);
+        //int bouncinessUps = PlayerPrefs.GetInt(Constants.BouncinessPrefString);
+        //int hookSpeedUps = PlayerPrefs.GetInt(Constants.HookSpeedPrefString);
 
-        if (ropeLengthUps > Constants.MaxRopeLengthUpgrades) ropeLengthUps = Constants.MaxRopeLengthUpgrades;
-        if (ropeSpeedUps > Constants.maxRopeSpeedUpgrades) ropeSpeedUps = Constants.maxRopeSpeedUpgrades;
-        if (bouncinessUps > Constants.maxBouncinessUpgrade) bouncinessUps = Constants.maxBouncinessUpgrade;
-        if (bouncinessUps > Constants.maxBouncinessUpgrade) hookSpeedUps = Constants.maxHookSpeedUpgrade;
+        //if (ropeLengthUps > Constants.MaxRopeLengthUpgrades) ropeLengthUps = Constants.MaxRopeLengthUpgrades;
+        //if (ropeSpeedUps > Constants.maxRopeSpeedUpgrades) ropeSpeedUps = Constants.maxRopeSpeedUpgrades;
+        //if (bouncinessUps > Constants.maxBouncinessUpgrade) bouncinessUps = Constants.maxBouncinessUpgrade;
+        //if (bouncinessUps > Constants.maxBouncinessUpgrade) hookSpeedUps = Constants.maxHookSpeedUpgrade;
 
-        PlayerPrefs.SetInt(Constants.RopeLengthPrefString, ropeLengthUps);
-        PlayerPrefs.SetInt(Constants.RopeSpeedPrefString, ropeSpeedUps);
-        PlayerPrefs.SetInt(Constants.BouncinessPrefString, bouncinessUps);
-        PlayerPrefs.SetInt(Constants.HookSpeedPrefString, hookSpeedUps);
+        //PlayerPrefs.SetInt(Constants.RopeLengthPrefString, ropeLengthUps);
+        //PlayerPrefs.SetInt(Constants.RopeSpeedPrefString, ropeSpeedUps);
+        //PlayerPrefs.SetInt(Constants.BouncinessPrefString, bouncinessUps);
+        //PlayerPrefs.SetInt(Constants.HookSpeedPrefString, hookSpeedUps);
     }
 
     public bool MakePurchase(string type) {
@@ -84,30 +98,34 @@ public class UpgradeManager : MonoBehaviour {
         PlayerPrefs.SetInt("Coins", coins - amountSpent);
 
         MainMenu.RefreshCoinAmount();
-        this.refreshItem(type);
+        this.UpdateUpgradeText(type);
         //this.loadItemData();
 
         return true;
     }
 
-    private void refreshItem(string pref) {
-        Upgrade upgrade = getUpgrade(pref);
+    /// <summary>
+    /// Updates the Upgrades text to be displayed.
+    /// </summary>
+    /// <param name="upgradeName">The upgrade name.</param>
+    private void UpdateUpgradeText(string upgradeName) {
+        Upgrade upgrade = getUpgrade(upgradeName);
         upgrade.costText.text = "" + (upgrade.cost + upgrade.costIncr * upgrade.curr).ToString();
         upgrade.currText.text = PlayerPrefs.GetInt(upgrade.prefName) + "/" + upgrade.max;
     }
 
-    public static Upgrade addUpgrade(string name, string prefName, int cost, int costIncr, int max, int curr, Text costText, Text currText) {
-        Upgrade upgrade = new Upgrade(prefName, cost, costIncr, max, curr, costText, currText);
+    public static Upgrade AddUpgrade(string name, string prefName, int cost, int costIncr, int max, int curr, float amtChange, Text costText, Text currText) {
+        Upgrade upgrade = new Upgrade(prefName, cost, costIncr, max, curr, amtChange, costText, currText);
         upgradeMap.Add(name, upgrade);
         return upgrade;
     }
 
-    public static Upgrade refreshOrAdd(string name, string prefName, int cost, int costIncr, int max, int curr, Text costText, Text currText) {
+    public static Upgrade RefreshOrAddUpgrade(string name, string prefName, int cost, int costIncr, int max, int curr, float amtChange, Text costText, Text currText) {
         Upgrade upgrade;
         upgradeMap.TryGetValue(name, out upgrade);
         if (upgrade == null) {
             //If we didn't get it out of the dictionary, add a new one.
-            upgrade = new Upgrade(prefName, cost, costIncr, max, curr, costText, currText);
+            upgrade = new Upgrade(prefName, cost, costIncr, max, curr, amtChange, costText, currText);
             upgradeMap.Add(name, upgrade);
         } else {
             //Gotta update these because they are new objects when the MainMenu is reloaded.
@@ -145,14 +163,16 @@ public class UpgradeManager : MonoBehaviour {
     public class Upgrade {
         public string prefName;
         public int cost, costIncr, max, curr;
+        public float amtChange;
         public Text costText, currText;
 
-        public Upgrade(string prefName, int cost, int costIncr, int max, int curr, Text costText, Text currText) {
+        public Upgrade(string prefName, int cost, int costIncr, int max, int curr, float amtChange, Text costText, Text currText) {
             this.prefName = prefName;
             this.cost = cost;
             this.costIncr = costIncr;
             this.max = max;
             this.curr = curr;
+            this.amtChange = amtChange;
 
             //These link the physical text boxes (in the GUI) to the upgrades.
             this.costText = costText;

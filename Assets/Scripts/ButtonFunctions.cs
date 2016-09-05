@@ -47,10 +47,6 @@ public class ButtonFunctions : MonoBehaviour {
     /// </summary>
     public void ToGameType() {
         SwapPanels(MainMenu.inst.gameTypePanelRectTransform);
-
-        //MainMenu.inst.currPanel.transform.position = MainMenu.inst.menuRoot.transform.position; //Move curr out
-        //MainMenu.inst.currPanel = MainMenu.inst.gameTypePanelRectTransform; //Switch curr
-        //MainMenu.inst.currPanel.position = MainMenu.inst.mainPanelRectTransform.position; //Move curr in
     }
 
     /// <summary>
@@ -59,24 +55,14 @@ public class ButtonFunctions : MonoBehaviour {
     public void ToItems() {
         MainMenu.inst.loadItemDataInfoIntoItemStore();
         SwapPanels(MainMenu.inst.itemPanelRectTransform);
-
-        //MainMenu.inst.currPanel.transform.position = MainMenu.inst.menuRoot.transform.position; //Move curr out
-        //MainMenu.inst.currPanel = MainMenu.inst.itemPanelRectTransform; //Switch curr
-        //MainMenu.inst.currPanel.position = MainMenu.inst.mainPanelRectTransform.position; //Move curr in
     }
 
     public void toDevMenu() {
         SwapPanels(MainMenu.inst.devPanelTransform);
-        //MainMenu.inst.currPanel.transform.position = MainMenu.inst.menuRoot.transform.position; //Move curr out
-        //MainMenu.inst.currPanel = MainMenu.inst.devPanelTransform; //Switch curr
-        //MainMenu.inst.currPanel.position = MainMenu.inst.mainPanelRectTransform.position; //Move curr in
     }
 
     public void ToMainMenu() {
         SwapPanels(MainMenu.inst.mainMenuPanelRectTransform);
-        //MainMenu.inst.currPanel.transform.position = MainMenu.inst.menuRoot.transform.position; //Move curr out
-        //MainMenu.inst.currPanel = MainMenu.inst.mainMenuPanelRectTransform; //Switch curr
-        //MainMenu.inst.currPanel.position = MainMenu.inst.mainPanelRectTransform.position; //Move curr in
     }
 
     private void SwapPanels(RectTransform swapIn) {

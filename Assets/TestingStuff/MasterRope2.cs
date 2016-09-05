@@ -1,28 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MasterRope : MonoBehaviour {
-
+public class MasterRope2 : MonoBehaviour {
     public bool testing = false;
-    public GameObject ropePrefab, weight;
-    public GameObject anchor { get; private set; }
-    public int segments = 10;
-    public float segmentLength  = 0.25f;
-    public float angle = 0f;
 
-    public HingeJoint2D bottomHingeJoint { get; private set; }
-    public HingeJoint2D topHingeJoint { get; private set; }
+    public GameObject anchor, ropePrefab, weight;
+    public int segments = 10;
+    public float segmentLength = 0.25f;
+    public float angle = 0f;
 
     public void Awake() {
         if (testing) Init();
-        var joints = GetComponents<HingeJoint2D>();
-        this.bottomHingeJoint = joints[0];
-        this.topHingeJoint = joints[1];
     }
 
     // Use this for initialization
     void Start() {
-        
+
     }
 
     /// <summary>
@@ -38,12 +31,12 @@ public class MasterRope : MonoBehaviour {
 
         for (int i = 0; i < segments; i++) {
             var newRope = Instantiate(ropePrefab, new Vector3(lastRope.transform.position.x + x, lastRope.transform.position.y + y, lastRope.transform.position.z), Quaternion.Euler(angle, 0f, 0f)) as GameObject;
-            var lastHinge = lastRope.transform.GetComponent<HingeJoint2D>();
-            var newHinge = newRope.GetComponent<HingeJoint2D>();
+            var lastHinge = lastRope.transform.GetComponent<ConfigurableJoint>();
+            var newHinge = newRope.GetComponent<ConfigurableJoint>();
 
             //Connect them together.
             //lastHinge.connectedBody = newRope.GetComponent<Rigidbody>();
-            lastHinge.connectedBody = newRope.GetComponent<Rigidbody2D>();
+            lastHinge.connectedBody = newRope.GetComponent<Rigidbody>();
 
             //Set parent.
             newRope.transform.parent = lastRope.transform;
@@ -54,13 +47,13 @@ public class MasterRope : MonoBehaviour {
             ropes[i] = newRope;
         }
 
-        if (testing) addWeight(lastRope);
+        if(testing) addWeight(lastRope);
 
         return ropes;
     }
 
     void Update() {
-        //this.topHingeJoint.anchor = new Vector2(anchor.transform.position.x, anchor.transform.position.y);
+
     }
 
     void addWeight(GameObject lastRope) {
@@ -69,13 +62,8 @@ public class MasterRope : MonoBehaviour {
         weightObj.transform.localPosition = new Vector3(0f, 0f, 0f);
         //weightObj.GetComponent<MeshRenderer>().enabled = false;
 
-        var hinge = lastRope.transform.GetComponent<HingeJoint2D>();
-        hinge.connectedBody = weightObj.GetComponent<Rigidbody2D>();
-    }
-
-    public void SetAnchor(GameObject anchor) {
-        this.anchor = anchor;
-        this.topHingeJoint.connectedBody = anchor.GetComponent<Rigidbody2D>();
+        var hinge = lastRope.transform.GetComponent<ConfigurableJoint>();
+        hinge.connectedBody = weightObj.GetComponent<Rigidbody>();
     }
 
     public void addAtEndOfRope(GameObject thingToAdd, GameObject lastRope) {

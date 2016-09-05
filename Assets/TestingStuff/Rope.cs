@@ -7,12 +7,23 @@ public class Rope : MonoBehaviour {
     public GameObject sprite;
     public float distance;
 
+    public new HingeJoint2D hingeJoint { get; private set; }
+
+    public void Awake() {
+        this.hingeJoint = GetComponent<HingeJoint2D>();
+    }
+
     // Use this for initialization
     void Start() {
         if (transform.childCount > 1) {
             sprite = transform.GetChild(0).gameObject;
             child = transform.GetChild(1);
+            if (!child.CompareTag("Rope Piece"))
+                child = null;
         }
+
+        if (child == null)
+            this.transform.GetChild(0).GetComponent<SpriteRenderer>().enabled = false;
     }
 
     // Update is called once per frame
@@ -28,7 +39,7 @@ public class Rope : MonoBehaviour {
 
         //Set the position, the scale (to the wall), and the angle of the rope.
         sprite.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-        sprite.transform.localScale = new Vector3(transform.localScale.x, distance, transform.localScale.z);
+        sprite.transform.localScale = new Vector3(0.5f, distance, transform.lossyScale.z);
 
         sprite.transform.rotation = Quaternion.Euler(0, 0, angleRadians * Mathf.Rad2Deg - 90);
     }
