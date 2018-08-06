@@ -16,8 +16,6 @@ public class Player : MonoBehaviour {
     private float distToHook, touchDownTime, holdDelay = 0.2f;
     private DistanceJoint2D joint;
     private Hook connectedHook;
-    private GameObject rope;
-    private MeshRenderer ropeRenderer;
     private Rigidbody2D rigidBody;
 
     private GameObject currRope;
@@ -31,14 +29,14 @@ public class Player : MonoBehaviour {
         Physics2D.IgnoreLayerCollision(8, 9);
 
         this.joint = GetComponent<DistanceJoint2D>();
-        this.rope = Instantiate(this.ropePrefab);
-        this.ropeRenderer = this.rope.transform.GetChild(0).GetComponent<MeshRenderer>();
         this.emitter = GameObject.Find("ImpactParticles").GetComponent<ParticleSystem>();
         this.levelScript = Camera.main.GetComponent<GameLevel>();
 
         this.rigidBody = GetComponent<Rigidbody2D>();
 
         this.calculateBonuses();
+
+        this.CreateRope(new Vector3(0, 0, 0), this.gameObject);
     }
 
     /// <summary>
@@ -55,8 +53,9 @@ public class Player : MonoBehaviour {
 
         BoxCollider2D collider = this.GetComponent<BoxCollider2D>();
 
-        UpgradeManager.Upgrade up = UpgradeManager.getUpgrade("bounciness");
-        collider.sharedMaterial.bounciness = Constants.Bounciness + up.curr * UpgradeManager.getUpgrade("bounciness").amtChange;
+        //UpgradeManager.Upgrade up = UpgradeManager.getUpgrade("bounciness");
+        //collider.sharedMaterial.bounciness = Constants.Bounciness + up.curr * UpgradeManager.getUpgrade("bounciness").amtChange;
+        collider.sharedMaterial.bounciness = 0;
 
         //Apparently you need to toggle this for the material to change.
         collider.enabled = false;
@@ -99,8 +98,7 @@ public class Player : MonoBehaviour {
             DrawRope();
 
         //If we are falling, make the rope invisible!
-        } else
-            this.rope.transform.localScale = new Vector3(0, 0, 0);
+        }
     }
 
     //When the screen is tapped.
@@ -131,7 +129,7 @@ public class Player : MonoBehaviour {
     public void ConnectToHook(Hook hook)
     {
         //If the joint was destroyed, that means we are falling.
-        if (this.joint != null)
+        if (!this.isFalling())
         {
             this.transform.parent = null;
             if (currRope)
@@ -166,6 +164,52 @@ public class Player : MonoBehaviour {
             //this.joint.distance = this.distToHook;
             //this.joint.connectedBody = hook.GetComponent<Rigidbody2D>();
         }
+    }
+
+    private void CreateRope(GameObject start, GameObject end) {
+        var masterRope = (Instantiate(ropePrefab2, new Vector3(start.transform.position.x, start.transform.position.y, start.transform.position.z), Quaternion.identity) as GameObject).GetComponent<MasterRope>();
+        var distance = Vector3.Distance(end.transform.position, start.transform.position);
+
+        var angleRadians = Mathf.Atan2(end.transform.position.y - start.transform.position.y, end.transform.position.x - start.transform.position.x);
+
+        masterRope.SetAnchor(start);
+
+        currRope = masterRope.gameObject;
+        //currRope.transform.parent = hook.transform;
+        masterRope.GetComponent<HingeJoint2D>().connectedBody = start.GetComponent<Rigidbody2D>();
+
+        //Set the angle and number of segments
+        masterRope.angle = angleRadians * Mathf.Rad2Deg;
+        masterRope.segments = (int)(distance / masterRope.segmentLength) + 1;
+
+        //Init the rope, get the last rope, and add the player to the end of the rope.
+        var ropes = masterRope.Init();
+        masterRope.addAtEndOfRope(end, ropes[ropes.Length - 1]);
+
+        currRopeSegment = ropes[ropes.Length - 1].GetComponent<Rope>();
+        nextRopeSegment = currRopeSegment.transform.parent.GetComponent<Rope>();
+    }
+
+    private void CreateRope(Vector3 start, GameObject end) {
+        var masterRope = (Instantiate(ropePrefab2, new Vector3(start.x, start.y, start.z), Quaternion.identity) as GameObject).GetComponent<MasterRope>();
+        var distance = Vector3.Distance(end.transform.position, start);
+
+        var angleRadians = Mathf.Atan2(end.transform.position.y - start.y, end.transform.position.x - start.x);
+
+        currRope = masterRope.gameObject;
+
+        //Set the angle and number of segments
+        masterRope.angle = angleRadians * Mathf.Rad2Deg;
+        masterRope.segments = (int)(distance / masterRope.segmentLength) + 1;
+
+        //Init the rope, get the last rope, and add the player to the end of the rope.
+        var ropes = masterRope.Init();
+        masterRope.addAtEndOfRope(end, ropes[ropes.Length - 1]);
+
+        currRopeSegment = ropes[ropes.Length - 1].GetComponent<Rope>();
+        nextRopeSegment = currRopeSegment.transform.parent.GetComponent<Rope>();
+
+        masterRope.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition;
     }
 
     //Reels in the hook.
@@ -208,7 +252,7 @@ public class Player : MonoBehaviour {
     }
 
     public bool isFalling(){
-        return this.transform.parent == null;
+        return this == null || this.gameObject == null || this.transform.parent == null;
     }
 
     void OnTriggerEnter2D(Collider2D coll){
@@ -240,6 +284,6 @@ public class Player : MonoBehaviour {
     void OnBecameInvisible()
     {
         levelScript.GameOver();
-        //Destroy(this.gameObject);
+        Destroy(this.gameObject);
     }
 }

@@ -9,7 +9,8 @@ public class GPGFunctions {
     }
 
 	public static bool incrementEvent(string id, uint amt) {
-        if (PlayGamesPlatform.Instance.IsAuthenticated()) {
+        if (PlayGamesPlatform.Instance.IsAuthenticated())
+        {
             PlayGamesPlatform.Instance.Events.IncrementEvent(id, amt);
             return true;
         }
@@ -23,7 +24,7 @@ public class GPGFunctions {
 
     public static bool isAuthenticated() {
         return PlayGamesPlatform.Instance.IsAuthenticated();
-        //return false;
+        return false;
     }
 
     public static bool submitScore(int score, string boardID) {

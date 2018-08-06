@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.Experimental.UIElements;
 
 public class StartScene : MonoBehaviour {
 
@@ -9,13 +10,21 @@ public class StartScene : MonoBehaviour {
         GPGFunctions.start();
         AdFunctions.instance().init();
 
-        NetChecker.Test(null);
-        StartCoroutine(NetChecker.checkInternetConnection((isConnected) => {
-            if (isConnected)
-                NetChecker.connection = NetChecker.Connection.Connected;
-            else
-                NetChecker.connection = NetChecker.Connection.NoInternet;
-        }));
+        //NetChecker.Test(null);
+        //StartCoroutine(NetChecker.checkInternetConnection((isConnected) => {
+        //    if (isConnected)
+        //    {
+        //        NetChecker.connection = NetChecker.Connection.Connected;
+        //        //foreach (Button button in buttonsToDisable)
+        //        //    button.interactable = false;
+        //    }
+        //    else
+        //    {
+        //        NetChecker.connection = NetChecker.Connection.NoInternet;
+        //        //foreach (Button button in buttonsToDisable)
+        //        //    button.interactable = false;
+        //    }
+        //}));
 
         StartCoroutine(loadGame());
     }

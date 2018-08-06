@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using GooglePlayGames;
+//using GooglePlayGames;
 using UnityEngine.UI;
+//using GameAnalyticsSDK;
 //using AppodealAds.Unity.Api;
 
 public class ButtonFunctions : MonoBehaviour {
@@ -18,6 +19,7 @@ public class ButtonFunctions : MonoBehaviour {
 	}
 
     public void Play(string type) {
+
         if (type == "normal") {
             GameLevel.levelType = GameLevel.LevelType.Normal;
             GPGFunctions.incrementEvent("CgkIzpi-qqMDEAIQBw", 1);
@@ -30,7 +32,10 @@ public class ButtonFunctions : MonoBehaviour {
             GameLevel.levelType = GameLevel.LevelType.Double;
             GPGFunctions.incrementEvent("CgkIzpi-qqMDEAIQCQ", 1);
         }
+
         SceneManager.LoadScene("Game");
+
+        //GameAnalytics.NewDesignEvent("play:mode:" + type);
     }
 
     public void Restart(){
@@ -39,7 +44,7 @@ public class ButtonFunctions : MonoBehaviour {
 
     public void LoadMainMenu(){
         SceneManager.LoadScene("MainMenu");
-        AdFunctions.instance().displayInterToMainMenu();
+        AdFunctions.instance().DisplayInterToMainMenu();
     }
 
     /// <summary>
@@ -55,6 +60,8 @@ public class ButtonFunctions : MonoBehaviour {
     public void ToItems() {
         MainMenu.inst.loadItemDataInfoIntoItemStore();
         SwapPanels(MainMenu.inst.itemPanelRectTransform);
+
+        //GameAnalytics.NewDesignEvent("gui:click:items");
     }
 
     public void toDevMenu() {
@@ -63,6 +70,8 @@ public class ButtonFunctions : MonoBehaviour {
 
     public void ToMainMenu() {
         SwapPanels(MainMenu.inst.mainMenuPanelRectTransform);
+
+        //GameAnalytics.NewDesignEvent("gui:click:mainMenu");
     }
 
     private void SwapPanels(RectTransform swapIn) {
@@ -91,16 +100,20 @@ public class ButtonFunctions : MonoBehaviour {
         } else {
             MainMenu.inst.loginGoogleButton.transform.GetChild(0).GetComponent<Text>().text = "Log In to \n Google Play";
             MainMenu.inst.leaderboardButton.interactable = false; //Enable the leaderboard button.
-            PlayGamesPlatform.Instance.SignOut();
+            //PlayGamesPlatform.Instance.SignOut();
         }
+
+        //GameAnalytics.NewDesignEvent("gui:click:loginGPG");
     }
 
     public void DisplayInterAd() {
-        //AdFunctions.instance().displayInter();
+        AdFunctions.instance().DisplayInter();
     }
 
     public void PlayRewardVideo() {
         AdFunctions.instance().displayRewardVideo();
+
+        //GameAnalytics.NewDesignEvent("gui:click:rewardVideo");
     }
 
     public void TestAdsHeyzap() {
@@ -129,8 +142,10 @@ public class ButtonFunctions : MonoBehaviour {
     }
 
     public void Purchase(string type) {
-        if(MainMenu.inst.upgradeManagerScript.MakePurchase(type)) {
+        if (MainMenu.inst.upgradeManagerScript.MakePurchase(type)) {
             this.GetComponent<AudioSource>().Play();
         }
+
+        //GameAnalytics.NewDesignEvent("items:purchase:" + type);
     }
 }

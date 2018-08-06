@@ -19,30 +19,32 @@ public class UpgradeManager : MonoBehaviour {
     }
 
     private void populateUpgrades() {
+        //TODO Took bounciness out for now... It doesn't work too well...
+
         int currRopeSpeed = PlayerPrefs.GetInt(Constants.RopeSpeedPrefString);
         int currRopeLength = PlayerPrefs.GetInt(Constants.RopeLengthPrefString);
-        int currBounciness = PlayerPrefs.GetInt(Constants.BouncinessPrefString);
+        //int currBounciness = PlayerPrefs.GetInt(Constants.BouncinessPrefString);
         int currHardHat = PlayerPrefs.GetInt("HardHat");
         int currHookSpeed = PlayerPrefs.GetInt("HookSpeed");
         //int coins = PlayerPrefs.GetInt(Defaults.CoinPrefString);
 
-        this.currSpeedText = GameObject.Find("CostSpeed").GetComponent<Text>();
-        this.currLengthText = GameObject.Find("CostLength").GetComponent<Text>();
-        this.currBouncinessText = GameObject.Find("CostBounciness").GetComponent<Text>();
-        this.currHardHatText = GameObject.Find("CostHardHat").GetComponent<Text>();
-        this.currHookSpeedText = GameObject.Find("CostHookSpeed").GetComponent<Text>();
-        this.currBirdShieldText = GameObject.Find("CostBirdShield").GetComponent<Text>();
+        this.costSpeedText = GameObject.Find("CostSpeed").GetComponent<Text>();
+        this.costLengthText = GameObject.Find("CostLength").GetComponent<Text>();
+        //this.costBouncinessText = GameObject.Find("CostBounciness").GetComponent<Text>();
+        this.costHardHatText = GameObject.Find("CostHardHat").GetComponent<Text>();
+        this.costHookSpeedText = GameObject.Find("CostHookSpeed").GetComponent<Text>();
+        this.costBirdShieldText = GameObject.Find("CostBirdShield").GetComponent<Text>();
 
-        this.costSpeedText = GameObject.Find("CurrSpeed").GetComponent<Text>();
-        this.costLengthText = GameObject.Find("CurrLength").GetComponent<Text>();
-        this.costBouncinessText = GameObject.Find("CurrBounciness").GetComponent<Text>();
-        this.costHardHatText = GameObject.Find("CurrHardHat").GetComponent<Text>();
-        this.costHookSpeedText = GameObject.Find("CurrHookSpeed").GetComponent<Text>();
-        this.costBirdShieldText = GameObject.Find("CurrBirdShield").GetComponent<Text>();
+        this.currSpeedText = GameObject.Find("CurrSpeed").GetComponent<Text>();
+        this.currLengthText = GameObject.Find("CurrLength").GetComponent<Text>();
+        //this.currBouncinessText = GameObject.Find("CurrBounciness").GetComponent<Text>();
+        this.currHardHatText = GameObject.Find("CurrHardHat").GetComponent<Text>();
+        this.currHookSpeedText = GameObject.Find("CurrHookSpeed").GetComponent<Text>();
+        this.currBirdShieldText = GameObject.Find("CurrBirdShield").GetComponent<Text>();
 
         RefreshOrAddUpgrade("ropespeed", "RopeSpeed", 15, 1, 5, currRopeSpeed, 0.05f, costSpeedText, currSpeedText);
         RefreshOrAddUpgrade("ropelength", "RopeLength", 15, 1, 5, currRopeLength, -0.5f, costLengthText, currLengthText);
-        RefreshOrAddUpgrade("bounciness", "Bounciness", 15, 1, 5, currBounciness, -0.01f, this.costBouncinessText, this.currBouncinessText);
+        //RefreshOrAddUpgrade("bounciness", "Bounciness", 15, 1, 5, currBounciness, -0.01f, this.costBouncinessText, this.currBouncinessText);
         RefreshOrAddUpgrade("hookspeed", "HookSpeed", 15, 1, 5, currHookSpeed, 0.01f, this.costHookSpeedText, this.currHookSpeedText);
         RefreshOrAddUpgrade("hardhat", "HardHat", 50, 0, 1, currHardHat, 0, this.costHardHatText, this.currHardHatText);
         RefreshOrAddUpgrade("birdshield", "BirdShield", 50, 0, 1, currHardHat, 0, this.costBirdShieldText, this.currBirdShieldText);
